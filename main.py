@@ -1,22 +1,30 @@
 import time
-
+import os
 import requests
 import datetime as dt
 
-APP_ID = "2b46501c"
-APY_KEY = "b1e90ebd3c32d37aa9343ff0deab3cb2"
+
 
 WEIGHT = "40"
 AGE = "11"
 HEIHGT = "160"
 
-URL_NUTRITIONIX = "https://trackapi.nutritionix.com/v2/natural/exercise"
-URL_SHEETY = "https://api.sheety.co/1f35fcee30d9ea1d5cf0c396068544a3/myWorkouts/sheet1"
+URL_NUTRITIONIX = os.environ.get("URL_NUTRITIONIX")
+URL_SHEETY = os.environ.get("URL_SHEETY")
+APP_ID = os.environ.get("APP_ID")
+APP_KEY = os.environ.get("APP_KEY")
+TOKEN = f"Bearer {os.environ.get("TOKEN")}"
+print(APP_ID, APP_KEY)
 
 headers_params = {
     "x-app-id": APP_ID,
-    "x-app-key": APY_KEY,
+    "x-app-key": APP_KEY,
 }
+
+headers_token = {
+    "Authorization": TOKEN
+}
+
 exercise_text = input("Tell me which exersice you did: ")
 query_params = {
     "query": exercise_text,
@@ -27,7 +35,7 @@ query_params = {
 }
 
 exercise_response = requests.post(URL_NUTRITIONIX, json=query_params, headers=headers_params)
-print(exercise_response.json())
+
 data_exercise = exercise_response.json()
 
 now = dt.datetime.now()
@@ -46,5 +54,5 @@ for exercise in data_exercise["exercises"]:
         }
     }
     print(sheety_body)
-    response = requests.post(URL_SHEETY, json=sheety_body)
+    response = requests.post(URL_SHEETY, json=sheety_body, headers=headers_token)
     print(response.text)
